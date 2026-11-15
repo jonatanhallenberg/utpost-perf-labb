@@ -51,6 +51,7 @@ services:
       CONTENTFUL_SPACE_ID: ${CONTENTFUL_SPACE_ID:-}
       CONTENTFUL_DELIVERY_TOKEN: ${CONTENTFUL_DELIVERY_TOKEN:-}
       CONTENTFUL_PREVIEW_TOKEN: ${CONTENTFUL_PREVIEW_TOKEN:-}
+      CMS_WEBHOOK_SECRET: ${CMS_WEBHOOK_SECRET:-}
     extra_hosts:
       - "host.docker.internal:host-gateway" # M7: samma namn på Linux (Docker Engine), där det inte finns av sig självt
     # Inga ports: browsern når API:et genom nginx i client (/api och /graphql skickas vidare

@@ -106,6 +106,7 @@ Redaktionens **notiser** bor i ett headless CMS (Contentful), inte i Postgres. R
 - **Två tillstånd, två nycklar.** Delivery-nyckeln ser bara publicerat. Preview-nyckeln ser även utkast och används bara när en inloggad redaktör (rollen `editor`) slår på *Förhandsgranska* på startsidan. Båda nycklarna ligger i `.env` på servern.
 - **Cache.** Publicerade notiser svaras ur minnet i en minut (`CMS_CACHE_SECONDS`). En publicering syns alltså efter upp till en minut.
 - **Utan CMS.** Saknas space-id och nyckel kör appen utan notiser. Så kör testerna i pipelinen.
+- **Webhook.** När redaktören publicerar anropar Contentful `POST /api/cms/webhook` med en hemlighet i headern `X-Utpost-Webhook-Secret`, och cachen töms. Då syns ändringen direkt. Contentful når inte `localhost`, så webhooken registreras mot staging. Lokalt provar ni den med `curl`.
 - **I molnet.** `RG=… APP=… infra/azure/cms-till-staging.sh` lägger nycklarna som secrets på containerappen och ger api-containern variablerna. Management-token ska inte dit.
 
 Sätt upp ett eget space: skapa ett konto och ett tomt space på contentful.com, fyll i `CONTENTFUL_SPACE_ID` och `CONTENTFUL_MANAGEMENT_TOKEN` i `.env` (se `.env.example`) och kör `npm run cms:setup`. Skriptet skapar innehållstypen *Notis* och tre notiser, varav en som utkast. Lägg sedan in delivery- och preview-nyckeln och starta om API:et.

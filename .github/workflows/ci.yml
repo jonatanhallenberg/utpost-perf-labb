@@ -113,6 +113,7 @@ jobs:
         with:
           scan-type: fs
           scan-ref: .
+          skip-dirs: spike            # M10: spiken i spike/ är ett experiment med egen lockfil – den byggs och deployas inte
           scanners: vuln,secret,misconfig
           severity: HIGH,CRITICAL
           ignore-unfixed: true

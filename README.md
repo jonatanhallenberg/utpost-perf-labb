@@ -40,6 +40,7 @@ npm run dev:client                    # Vue-klienten på :3001 med hot reload, /
 - `infra/azure/` – staging i Azure Container Apps (M6): `staging.yaml` beskriver appen (client + api + postgres + mongo som sidecars), `skapa-staging.sh` skapar den en gång. Pipelinen byter sedan bara image. `skapa-funktion.sh` (M7) skapar bildfunktionen i Azure Functions.
 - `scripts/perf.mjs` – mätskriptet för M10: kör Lighthouse (mobil, långsamt 4G) mot appen på :3001 och skriver ut en rad per sida. Jämför med `perf-fore.json` när den finns.
 - `scripts/mat-upload.mjs` – mätskriptet för M7: N samtidiga uppladdningar medan `/api/health` frågas var 100:e ms.
+- `spike/nuxt-guider/` – spik för M10: guidesidorna i Nuxt (SSR och SSG) mot samma GraphQL-API. Eget paket, deployas inte. Se mappens README.
 - `compose.yaml` – hela miljön. `docs/decisions/` – teamets beslutsdokument.
 
 ## Kommandon (kör från roten)
@@ -58,6 +59,22 @@ npm run dev:client                    # Vue-klienten på :3001 med hot reload, /
     npm run build             # vite build av client/
     npm run mongo:smoke [id]  # skriver en tur ur Postgres som ett dokument i MongoDB och läser tillbaka
     npm run migrate:logs      # alla turer med mätpunkter → MongoDB, med kontroll av antalet (M5)
+
+## Snabb (M10)
+
+Skuld 11: en enda bundle, bilder rakt ur kameran, ingen SSR. Arbetssättet är alltid detsamma: **mät, hitta, laga en sak, mät igen.**
+
+```bash
+docker compose up -d --build --wait   # mät det som deployas: imagen bakom nginx, aldrig npm run dev
+npm run perf -- --fore                # före-värdet: LCP, CLS och vikt för startsidan, en guide och en tur → perf-fore.json
+# … ändra en sak …
+docker compose up -d --build --wait client
+npm run perf                          # samma mätning igen, med förbättringen i procent mot före-värdet
+```
+
+`npm run perf` kör Lighthouse som en mobil på långsamt 4G (första gången hämtas `@lhci/cli` med npx, det tar en stund). Siffrorna är en modell: jämför dem med varandra, inte med vad ni ser på er egen dator. För att se *varför* en sida är långsam: DevTools → Performance (Local metrics visar LCP-elementet) och Network (storlek och vattenfall), och `npx vite-bundle-visualizer` i `client/` för vad som ligger i varje JavaScript-fil.
+
+Mätningarna och optimeringarna skrivs i `docs/performance.md`, renderingsvalet i `docs/decisions/rendering.md`.
 
 ## Konfiguration och hemligheter (M6)
 

@@ -66,15 +66,26 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
 </script>
 
 <template>
+  <!-- M10: bilden är sidans största element (LCP) och behöver inga data – den står utanför
+       v-if-kedjan, så browsern får veta om den direkt och inte först när API:et har svarat.
+       width/height ger proportionerna, så platsen är reserverad innan bilden kommit.
+       fetchpriority="high": den här bilden före allt annat. Aldrig loading="lazy" på LCP-bilden. -->
+  <section class="hero">
+    <img
+      class="hero-img"
+      src="/bilder/start.webp"
+      width="1200"
+      height="600"
+      alt=""
+      fetchpriority="high"
+    />
+    <h1>Hitta din nästa tur</h1>
+    <p v-if="data">{{ data.guides.length }} guider i {{ data.regions.length }} landskap.</p>
+  </section>
+
   <p v-if="error" role="alert">Kunde inte hämta startsidan: {{ error.message }}</p>
   <p v-else-if="fetching || !data">Laddar…</p>
   <div v-else>
-    <section class="hero">
-      <img class="hero-img" src="/bilder/start.jpg" alt="" />
-      <h1>Hitta din nästa tur</h1>
-      <p>{{ data.guides.length }} guider i {{ data.regions.length }} landskap.</p>
-    </section>
-
     <label v-if="isEditor" class="muted">
       <input v-model="showDrafts" type="checkbox" /> Förhandsgranska: visa utkast
     </label>
@@ -115,6 +126,7 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
 }
 .hero-img {
   width: 100%;
+  height: auto;
   border-radius: 6px;
   margin-bottom: 12px;
 }

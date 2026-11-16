@@ -14,6 +14,7 @@
     "dev:client": "npm run dev --workspace=client",
     "dev:functions": "npm --prefix functions start",
     "mat": "node scripts/mat-upload.mjs",
+    "perf": "node scripts/perf.mjs",
     "cms:setup": "node --env-file-if-exists=.env scripts/cms-setup.mjs",
     "lint": "npm run lint --workspace=client",
     "typecheck": "npm run codegen --workspace=client && npm run typecheck --workspace=client && npm run typecheck --workspace=api",

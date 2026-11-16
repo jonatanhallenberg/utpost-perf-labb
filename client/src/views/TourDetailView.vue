@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import type { Photo, TourDetail } from '@utpost/shared'
 import { get } from '../api'
 import { elevationGain, formatKm } from '../lib/tours'
+import ElevationChart from '../components/ElevationChart.vue'
 
 const route = useRoute()
 const tour = ref<TourDetail | null>(null)
@@ -39,6 +40,14 @@ const time = (iso: string) => new Date(iso).toLocaleTimeString('sv-SE')
       {{ formatKm(tour.distance_m) }} · {{ tour.logs.length }} mätpunkter · {{ climb }} höjdmeter
     </p>
     <p v-if="tour.notes">{{ tour.notes }}</p>
+
+    <section v-if="tour.logs.length > 1">
+      <h2>Höjdprofil</h2>
+      <ElevationChart
+        :labels="tour.logs.map((log) => time(log.recorded_at))"
+        :elevations="tour.logs.map((log) => log.elevation_m)"
+      />
+    </section>
 
     <section>
       <h2>Bilder</h2>

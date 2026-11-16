@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import _ from 'lodash'
 import type { Guide } from '@utpost/shared'
 import { get } from '../api'
 import GuideCard from '../components/GuideCard.vue'
@@ -25,10 +26,13 @@ onMounted(load)
 
 const visible = computed(() => {
   const q = query.value.trim().toLowerCase()
-  if (!q) return guides.value
-  return guides.value.filter(
-    (g) => g.title.toLowerCase().includes(q) || g.region.toLowerCase().includes(q),
-  )
+  const hits = q
+    ? guides.value.filter(
+        (g) => g.title.toLowerCase().includes(q) || g.region.toLowerCase().includes(q),
+      )
+    : guides.value
+  // Listan visas per landskap, och i bokstavsordning inom varje landskap
+  return _.orderBy(hits, ['region', 'title'])
 })
 </script>
 

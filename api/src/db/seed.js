@@ -52,7 +52,7 @@ export const seed = async () => {
       [
         title.toLowerCase().replace(/[åä]/g, 'a').replace(/ö/g, 'o').replace(/\s+/g, '-'), title, region, pick(DIFFICULTY),
         Math.round((3 + Math.random() * 25) * 10) / 10,
-        bodyHtml(title, region), `hero-${i + 1}.jpg`, i % 9 !== 0, userIds[0],
+        bodyHtml(title, region), `hero-${(i % 6) + 1}.jpg`, i % 9 !== 0, userIds[0],
       ],
     );
     guideIds.push(res.rows[0].id);

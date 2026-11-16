@@ -4,6 +4,7 @@ import { useQuery } from '@urql/vue'
 import { graphql } from '../gql'
 import { useAuthStore } from '../stores/auth'
 import NoticeList from '../components/NoticeList.vue'
+import { formatDifficulty } from '../lib/format'
 
 // Startsidan: EN fråga som ber om exakt de fält mallen nedan visar (skuld 6).
 // M5: frågan skrivs i graphql(`…`) så att codegen ser den. Typen på svaret genereras ur schemat –
@@ -31,11 +32,14 @@ const HomeDocument = graphql(/* GraphQL */ `
       region
       difficulty
       lengthKm
+      bodyHtml
+      heroImage
     }
     popularGuides(limit: 6) {
       slug
       title
       region
+      heroImage
     }
     regions
     tours(limit: 5) {
@@ -66,6 +70,7 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
   <p v-else-if="fetching || !data">Laddar…</p>
   <div v-else>
     <section class="hero">
+      <img class="hero-img" src="/bilder/start.jpg" alt="" />
       <h1>Hitta din nästa tur</h1>
       <p>{{ data.guides.length }} guider i {{ data.regions.length }} landskap.</p>
     </section>
@@ -76,8 +81,9 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
     <NoticeList :notices="data.notices" />
 
     <h2>Populärast just nu</h2>
-    <ul class="list">
+    <ul class="cards">
       <li v-for="g in data.popularGuides" :key="g.slug">
+        <img v-if="g.heroImage" :src="`/bilder/${g.heroImage}`" alt="" />
         <RouterLink :to="`/guider/${g.slug}`">{{ g.title }}</RouterLink>
         <span class="muted"> {{ g.region }}</span>
       </li>
@@ -95,7 +101,9 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
     <ul class="list">
       <li v-for="g in data.guides" :key="g.slug">
         <RouterLink :to="`/guider/${g.slug}`">{{ g.title }}</RouterLink>
-        <span class="muted"> {{ g.region }} · {{ g.difficulty }} · {{ g.lengthKm }} km</span>
+        <span class="muted">
+          {{ g.region }} · {{ formatDifficulty(g.difficulty) }} · {{ g.lengthKm }} km</span
+        >
       </li>
     </ul>
   </div>
@@ -104,6 +112,23 @@ const { data, fetching, error } = useQuery({ query: HomeDocument, variables, req
 <style scoped>
 .hero {
   padding: 24px 0;
+}
+.hero-img {
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.cards {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.cards img {
+  width: 100%;
+  border-radius: 4px;
+  display: block;
 }
 .list {
   padding-left: 18px;

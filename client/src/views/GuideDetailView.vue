@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useQuery } from '@urql/vue'
 import { graphql } from '../gql'
 import NoticeList from '../components/NoticeList.vue'
+import { formatDifficulty } from '../lib/format'
 
 // Detaljvyn: frågan tar en variabel ($slug) i stället för att klistra in adressen i strängen.
 // Codegen genererar typen för variablerna också – skicka fel typ, och typecheck säger ifrån.
@@ -15,6 +16,7 @@ const GuideDocument = graphql(/* GraphQL */ `
       region
       difficulty
       lengthKm
+      heroImage
       bodyHtml
       notices {
         id
@@ -45,9 +47,16 @@ const { data, fetching, error } = useQuery({ query: GuideDocument, variables })
   <p v-else-if="fetching || !data">Laddar…</p>
   <p v-else-if="!data.guide" role="alert">Det finns ingen guide som heter så.</p>
   <article v-else>
+    <img
+      v-if="data.guide.heroImage"
+      class="hero-img"
+      :src="`/bilder/${data.guide.heroImage}`"
+      alt=""
+    />
     <h1>{{ data.guide.title }}</h1>
     <p class="muted">
-      {{ data.guide.region }} · {{ data.guide.difficulty }} · {{ data.guide.lengthKm }} km
+      {{ data.guide.region }} · {{ formatDifficulty(data.guide.difficulty) }} ·
+      {{ data.guide.lengthKm }} km
     </p>
     <!-- M9: notiserna för den här guiden kommer ur CMS:et, som data. Jämför med raden under. -->
     <NoticeList :notices="data.guide.notices" />
@@ -64,5 +73,10 @@ const { data, fetching, error } = useQuery({ query: GuideDocument, variables })
 }
 .body {
   max-width: 70ch;
+}
+.hero-img {
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 12px;
 }
 </style>

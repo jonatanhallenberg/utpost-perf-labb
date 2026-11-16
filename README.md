@@ -38,6 +38,7 @@ npm run dev:client                    # Vue-klienten på :3001 med hot reload, /
 - `functions/` – bildbearbetningen som en Azure Function (M7): HTTP-triggern `process-image` (`src/process-image.js`, Node v4-modellen) och bildkoden (`src/image.js`, ren JS). Eget npm-paket med egen `package-lock.json` – **inte** en workspace, så att deploypaketet är självbärande. Körs lokalt med Core Tools (`func start`).
 - `shared/` – API-kontraktet som TypeScript-typer (`@utpost/shared`), används av `api/` och `client/`.
 - `infra/azure/` – staging i Azure Container Apps (M6): `staging.yaml` beskriver appen (client + api + postgres + mongo som sidecars), `skapa-staging.sh` skapar den en gång. Pipelinen byter sedan bara image. `skapa-funktion.sh` (M7) skapar bildfunktionen i Azure Functions.
+- `scripts/perf.mjs` – mätskriptet för M10: kör Lighthouse (mobil, långsamt 4G) mot appen på :3001 och skriver ut en rad per sida. Jämför med `perf-fore.json` när den finns.
 - `scripts/mat-upload.mjs` – mätskriptet för M7: N samtidiga uppladdningar medan `/api/health` frågas var 100:e ms.
 - `compose.yaml` – hela miljön. `docs/decisions/` – teamets beslutsdokument.
 
@@ -46,6 +47,7 @@ npm run dev:client                    # Vue-klienten på :3001 med hot reload, /
     npm run dev:client        # Vue-klienten på :3001 (API:et måste köra: npm run dev:api)
     npm run dev:functions     # bildfunktionen med func start på :7071 (M7) – kräver Core Tools och functions/node_modules
     npm run mat               # mätskriptet: 10 samtidiga uppladdningar à 4000x3000 mot :4000 (npm run mat -- --n 20)
+    npm run perf              # M10: Lighthouse mot startsidan, en guide och en tur i den körande appen (docker compose up) – LCP, CLS och vikt per sida. --fore sparar före-värdet
     npm run cms:setup         # M9: skapar innehållstypen Notis och tre notiser i ert Contentful-space (kräver space-id och CMA-token i .env)
     npm run lint              # ESLint på client/
     npm run format:check      # Prettier – bara kontroll, ändrar inget
